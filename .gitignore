@@ -5,3 +5,6 @@ tmp/
 # Web client
 web/node_modules/
 web/dist/
+
+# Env
+.env
