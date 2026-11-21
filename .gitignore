@@ -1,0 +1,7 @@
+# Go
+tmp/
+/main
+
+# Web client
+web/node_modules/
+web/dist/

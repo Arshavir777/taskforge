@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+
 	"taskforge/internal/model"
 
 	"gorm.io/gorm"
@@ -14,8 +16,33 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (r *UserRepository) GetUsers() ([]model.User, error) {
+func (r *UserRepository) GetUsers(ctx context.Context) ([]model.User, error) {
 	var users []model.User
-	err := r.db.Find(&users).Error
-	return users, err
+	if err := r.db.WithContext(ctx).Find(&users).Error; err != nil {
+		return nil, translateErr(err)
+	}
+	return users, nil
+}
+
+// Create returns domain.ErrConflict when the email or API key already exists.
+func (r *UserRepository) Create(ctx context.Context, user *model.User) error {
+	return translateErr(r.db.WithContext(ctx).Create(user).Error)
+}
+
+// FindByEmail returns domain.ErrNotFound when no user matches.
+func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*model.User, error) {
+	var user model.User
+	if err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, translateErr(err)
+	}
+	return &user, nil
+}
+
+// FindByID returns domain.ErrNotFound when no user matches.
+func (r *UserRepository) FindByID(ctx context.Context, id uint) (*model.User, error) {
+	var user model.User
+	if err := r.db.WithContext(ctx).First(&user, id).Error; err != nil {
+		return nil, translateErr(err)
+	}
+	return &user, nil
 }

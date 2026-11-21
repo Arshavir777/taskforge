@@ -25,6 +25,7 @@ type Job struct {
 	Attempts    int            `gorm:"not null;default:0" json:"attempts"`
 	CreatedAt   time.Time      `gorm:"not null;index:idx_status_created,sort:desc" json:"created_at"`
 	UpdatedAt   time.Time      `gorm:"not null" json:"updated_at"`
+	StartedAt   *time.Time     `gorm:"default:null" json:"started_at,omitempty"`   // Set when a worker claims the job
 	CompletedAt *time.Time     `gorm:"default:null" json:"completed_at,omitempty"` // Nullable until completed
 
 	// Relationship mapping (Optional if you have a User model)
